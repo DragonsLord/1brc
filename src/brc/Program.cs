@@ -1,4 +1,6 @@
-﻿var cts = new CancellationTokenSource();
+﻿using System.Globalization;
+
+var cts = new CancellationTokenSource();
 Console.CancelKeyPress += (sender, e) => cts.Cancel();
 var token = cts.Token;
 
@@ -10,23 +12,22 @@ var result = new Dictionary<string, (decimal Min, decimal Max, int Count, decima
 while (!textReader.EndOfStream && !token.IsCancellationRequested)
 {
     var line = await textReader.ReadLineAsync(token);
-    var measure = line.Split(';');
+    var measure = line!.Split(';');
     var station = measure[0];
-    var temperature = decimal.Parse(measure[1].AsSpan());
+    var temperature = decimal.Parse(measure[1].AsSpan(), CultureInfo.InvariantCulture);
 
-    if (!result.ContainsKey(station))
+    if (!result.TryGetValue(station, out var value))
     {
         result.Add(station, (temperature, temperature, 1, temperature));
     }
     else
     {
-        var stats = result[station];
-        stats.Min = Math.Min(stats.Min, temperature);
-        stats.Max = Math.Max(stats.Max, temperature);
-        stats.Count += 1;
-        stats.Sum += temperature;
-        // TODO: use ref type instead of value type tuple
-        result[station] = stats;
+        value.Min = Math.Min(value.Min, temperature);
+        value.Max = Math.Max(value.Max, temperature);
+        value.Count += 1;
+        value.Sum += temperature;
+        // TODO: use ref type instead of value type tuple?
+        result[station] = value;
     }
 }
 
