@@ -7,7 +7,7 @@ var token = cts.Token;
 var dataPath = "data/measurements.txt";
 using var textReader = new StreamReader(dataPath);
 
-var result = new Dictionary<string, (decimal Min, decimal Max, int Count, decimal Sum)>();
+var stats = new StationsStats();
 
 while (!textReader.EndOfStream && !token.IsCancellationRequested)
 {
@@ -16,26 +16,14 @@ while (!textReader.EndOfStream && !token.IsCancellationRequested)
     var station = measure[0];
     var temperature = decimal.Parse(measure[1].AsSpan(), CultureInfo.InvariantCulture);
 
-    if (!result.TryGetValue(station, out var value))
-    {
-        result.Add(station, (temperature, temperature, 1, temperature));
-    }
-    else
-    {
-        value.Min = Math.Min(value.Min, temperature);
-        value.Max = Math.Max(value.Max, temperature);
-        value.Count += 1;
-        value.Sum += temperature;
-        // TODO: use ref type instead of value type tuple?
-        result[station] = value;
-    }
+    stats.AddMeasurement(station, temperature);
 }
 
-foreach (var item in result)
+foreach (var item in stats.Stats)
 {
     var station = item.Key;
     var min = item.Value.Min;
     var mean = item.Value.Sum / item.Value.Count;
     var max = item.Value.Max;
-    Console.WriteLine($"{station}={min}/{mean}/{max}");
+    Console.WriteLine($"{station}={min}/{mean:#.0}/{max}");
 }
