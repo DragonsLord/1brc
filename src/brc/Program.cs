@@ -1,11 +1,13 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics;
+using System.Globalization;
 
 var cts = new CancellationTokenSource();
 Console.CancelKeyPress += (sender, e) => cts.Cancel();
 var token = cts.Token;
+var startTime = Stopwatch.GetTimestamp();
 
 var dataPath = "data/measurements.txt";
-using var textReader = new StreamReader(dataPath);
+using var textReader = new StreamReader(dataPath, new FileStreamOptions { BufferSize = 1_000_000 });
 
 var stats = new StationsStats();
 
@@ -27,3 +29,6 @@ foreach (var item in stats.Stats)
     var max = item.Value.Max;
     Console.WriteLine($"{station}={min}/{mean:#.0}/{max}");
 }
+
+var elapsedTime = Stopwatch.GetElapsedTime(startTime);
+Console.WriteLine($"Elapsed: {elapsedTime}");
