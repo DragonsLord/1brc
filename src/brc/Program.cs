@@ -1,19 +1,16 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
 
-var cts = new CancellationTokenSource();
-Console.CancelKeyPress += (sender, e) => cts.Cancel();
-var token = cts.Token;
 var startTime = Stopwatch.GetTimestamp();
 
 var dataPath = "data/measurements.txt";
-using var textReader = new StreamReader(dataPath, new FileStreamOptions { BufferSize = 1_000_000 });
+using var reader = new StreamReader(dataPath, new FileStreamOptions { BufferSize = 1_000_000 });
 
 var stats = new StationsStats();
 
-while (!textReader.EndOfStream && !token.IsCancellationRequested)
+while (!reader.EndOfStream)
 {
-    var line = await textReader.ReadLineAsync(token);
+    var line = reader.ReadLine();
     var measure = line!.Split(';');
     var station = measure[0];
     var temperature = decimal.Parse(measure[1].AsSpan(), CultureInfo.InvariantCulture);
