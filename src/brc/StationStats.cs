@@ -1,25 +1,29 @@
-internal class StationStats(decimal initTemperature)
+using System.Numerics;
+
+internal class StationStats<T>(T initTemperature)
+    where T : INumber<T>
 {
-    public decimal Min { get; set; } = initTemperature;
-    public decimal Max { get; set; } = initTemperature;
-    public decimal Sum { get; set; } = initTemperature;
+    public T Min { get; set; } = initTemperature;
+    public T Max { get; set; } = initTemperature;
+    public T Sum { get; set; } = initTemperature;
     public int Count { get; set; } = 1;
 }
 
-internal class StationsStats
+internal class StationsStats<T>
+    where T : INumber<T>
 {
-    public Dictionary<string, StationStats> Stats { get; } = [];
+    public Dictionary<string, StationStats<T>> Stats { get; } = [];
 
-    public void AddMeasurement(string station, decimal temperature)
+    public void AddMeasurement(string station, T temperature)
     {
         if (!Stats.TryGetValue(station, out var value))
         {
-            Stats.Add(station, new StationStats(temperature));
+            Stats.Add(station, new StationStats<T>(temperature));
         }
         else
         {
-            value.Min = Math.Min(value.Min, temperature);
-            value.Max = Math.Max(value.Max, temperature);
+            value.Min = value.Min > temperature ? temperature : value.Min;
+            value.Max = value.Max < temperature ? temperature : value.Max;
             value.Count += 1;
             value.Sum += temperature;
         }
