@@ -11,7 +11,7 @@ internal class StationStats<T>(T initTemperature)
 
 internal class StationsStats
 {
-    public Dictionary<string, StationStats<int>> Stats { get; } = [];
+    public Dictionary<string, StationStats<int>> Stats { get; } = new(500);
 
     /* private readonly List<StationStats<int>> _stats = []; */
 
