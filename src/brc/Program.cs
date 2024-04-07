@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 
+Console.WriteLine("Starting...");
 var startTime = Stopwatch.GetTimestamp();
 
 var dataPath = "data/measurements.txt";
@@ -16,11 +17,10 @@ while (!reader.EndOfStream)
 
 foreach (var item in stats.Stats)
 {
-    var station = item.Key;
-    decimal min = item.Value.Min / 10;
-    decimal mean = item.Value.Sum / 10M / item.Value.Count;
-    decimal max = item.Value.Max / 10;
-    Console.WriteLine($"{station}={min}/{mean:#.0}/{max}");
+    decimal min = item.Min / 10;
+    decimal mean = item.Sum / 10M / item.Count;
+    decimal max = item.Max / 10;
+    Console.WriteLine($"{item.StationName}={min}/{mean:#.0}/{max}");
 }
 
 var elapsedTime = Stopwatch.GetElapsedTime(startTime);
